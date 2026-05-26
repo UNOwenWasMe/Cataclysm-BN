@@ -439,7 +439,7 @@ class json_flag
             return requires_flag_;
         }
 
-        /** Tags */
+        /** The tag to be displayed on the item's display name when it has this flag */
         std::string tag() const {
             return tag_;
         }

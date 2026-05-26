@@ -5234,12 +5234,16 @@ std::string item::tname( unsigned int quantity, bool with_prefix, unsigned int t
     // to the item name. Used for things like (wet) or (XL) that are implemented as flags, but
     // also for mod-added json flags that might not be known in advance.
 
-    for( const flag_id &f : this->get_flags() ) {
-        tagtext += f->tag();
-    }
+    std::vector<flag_id> all_flags;
 
-    for( const flag_id &f : type->item_tags ) {
-        tagtext += f->tag();
+    all_flags.insert( all_flags.end(), this->get_flags().begin(), this->get_flags().end() );
+
+    all_flags.insert( all_flags.end(), type->item_tags.begin(), type->item_tags.end() );
+
+    for( const flag_id &f : all_flags ) {
+        if( !f->tag().empty() ) {
+            tagtext += " " + f->tag();
+        }
     }
 
     if( is_favorite ) {
