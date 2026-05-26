@@ -4133,11 +4133,11 @@ void item::final_info( std::vector<iteminfo> &info, const iteminfo_query &parts_
 
         std::string signame;
         if( has_flag( flag_RADIOSIGNAL_1 ) ) {
-            signame = "<color_c_red>red</color> radio signal.";
+            signame = "<color_c_red>red</color> radio signal";
         } else if( has_flag( flag_RADIOSIGNAL_2 ) ) {
-            signame = "<color_c_blue>blue</color> radio signal.";
+            signame = "<color_c_blue>blue</color> radio signal";
         } else if( has_flag( flag_RADIOSIGNAL_3 ) ) {
-            signame = "<color_c_green>green</color> radio signal.";
+            signame = "<color_c_green>green</color> radio signal";
         }
         if( parts->test( iteminfo_parts::DESCRIPTION_RADIO_ACTIVATION_CHANNEL ) ) {
             info.emplace_back( "DESCRIPTION",
@@ -5150,11 +5150,6 @@ std::string item::tname( unsigned int quantity, bool with_prefix, unsigned int t
         }
     }
 
-    if( has_flag( flag_resized_large ) ) {
-        tagtext += _( " (XL)" );
-    } else if( has_flag( flag_resized_small ) ) {
-        tagtext += _( " (XS)" );
-    }
     const sizing sizing_level = get_sizing( you );
 
     if( sizing_level == sizing::human_sized_small_char ) {
@@ -5217,38 +5212,11 @@ std::string item::tname( unsigned int quantity, bool with_prefix, unsigned int t
         tagtext += string_format( " (%s [%d])", nname( item ), std::max( 1, item->volume / 250_ml ) * 5 );
     }
 
-    if( has_flag( flag_RADIO_MOD ) ) {
-        tagtext += _( " (radio:" );
-        if( has_flag( flag_RADIOSIGNAL_1 ) ) {
-            tagtext += pgettext( "The radio mod is associated with the [R]ed button.", "R)" );
-        } else if( has_flag( flag_RADIOSIGNAL_2 ) ) {
-            tagtext += pgettext( "The radio mod is associated with the [B]lue button.", "B)" );
-        } else if( has_flag( flag_RADIOSIGNAL_3 ) ) {
-            tagtext += pgettext( "The radio mod is associated with the [G]reen button.", "G)" );
-        } else {
-            debugmsg( "Why is the radio neither red, blue, nor green?" );
-            tagtext += "?)";
-        }
-    }
-
-    if( has_flag( flag_WET ) ) {
-        tagtext += _( " (wet)" );
-    }
     if( already_used_by_player( you ) ) {
         tagtext += _( " (used)" );
     }
     if( has_flag( flag_IS_UPS ) && get_var( "cable" ) == "plugged_in" ) {
         tagtext += _( " (plugged in)" );
-    }
-    if( has_flag( flag_SPAWN_FRIENDLY ) ) {
-        tagtext += _( " (friendly)" );
-    }
-    if( has_flag( flag_SPAWN_HOSTILE ) ) {
-        tagtext += _( " (hostile)" );
-    }
-
-    if( is_favorite ) {
-        tagtext += _( " *" ); // Display asterisk for favorite items
     }
 
     std::string modtext;
@@ -5260,6 +5228,22 @@ std::string item::tname( unsigned int quantity, bool with_prefix, unsigned int t
     }
     if( has_flag( flag_DIAMOND ) ) {
         modtext += std::string( pgettext( "Adjective, as in diamond katana", "diamond" ) ) + " ";
+    }
+
+    // These two loops go over all flags, static and dynamic, and adds their json-defined "tag" display strings
+    // to the item name. Used for things like (wet) or (XL) that are implemented as flags, but
+    // also for mod-added json flags that might not be known in advance.
+
+    for( const flag_id &f : this->get_flags() ) {
+        tagtext += f->tag();
+    }
+
+    for( const flag_id &f : type->item_tags ) {
+        tagtext += f->tag();
+    }
+
+    if( is_favorite ) {
+        tagtext += _( " *" ); // Display asterisk for favorite items
     }
 
     //~ This is a string to construct the item name as it is displayed. This format string has been added for maximum flexibility. The strings are: %1$s: Damage text (e.g. "bruised"). %2$s: burn adjectives (e.g. "burnt"). %3$s: tool modifier text (e.g. "atomic"). %4$s: vehicle part text (e.g. "3.8-Liter"). $5$s: main item text (e.g. "apple"). %6s: tags (e.g. "(wet) (poor fit)").
