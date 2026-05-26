@@ -6,7 +6,7 @@
 {
   "type": "json_flag", // Required type
   "id": "GENERIC_FLAG", // Flag ID
-  "context": [ ], // Fluff field that does nothing but is required to exist
+  "context": [], // Fluff field that does nothing but is required to exist
   "craft_inherit": true, // Items made with it will keep this flag
   "requires_flag": true, // Used by vehicle part flags, requires another part with this ID on the tile
   "inherit": true, // Item mods will pass this flag down to the item
